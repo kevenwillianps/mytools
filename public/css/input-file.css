@@ -1,0 +1,50 @@
+.file-drop-area {
+    position: relative;
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    max-width: 100%;
+    padding: 25px;
+    border-radius: 3px;
+    -webkit-transition: 0.2s;
+    transition: 0.2s;
+}
+
+.file-drop-area.is-active {
+    background-color: rgba(254, 189, 155, 1);
+}
+
+.fake-btn {
+    color: #ffffff;
+    background-color: #5D9AEA;
+    border: 1px solid #4E91E8;
+    border-radius: 3px;
+    padding: 8px 15px;
+    text-transform: uppercase;
+    transition: 0.5s;
+}
+
+.file-drop-area:hover .fake-btn {
+    transition: 0.5s;
+    background-color: #4E91E8;
+}
+
+.file-msg {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+.file-input:focus {
+    outline: none;
+}
