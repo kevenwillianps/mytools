@@ -16,7 +16,7 @@ class General
 {
 
     /** Construtor da classe */
-    function __construct()
+    public function __construct()
     {
         ob_start();
 
@@ -42,15 +42,12 @@ class General
             ->Config
             ->general
             ->password);
-
     }
 
     //ANTIINJECTION
     public function AntiInjection($texto)
     {
-        if (!is_array($texto))
-        {
-
+        if (!is_array($texto)) {
             $badchar[1] = " drop ";
             $badchar[2] = " select ";
             $badchar[3] = " delete ";
@@ -78,12 +75,10 @@ class General
 
             $y = 1;
             $x = sizeof($badchar);
-            while ($y <= $x)
-            {
-                $pos = strpos(strtolower($texto) , strtolower($badchar[$y]));
-                if ($pos !== false)
-                {
-                    $texto = str_replace(strtolower($badchar[$y]) , "", strtolower($texto));
+            while ($y <= $x) {
+                $pos = strpos(strtolower($texto), strtolower($badchar[$y]));
+                if ($pos !== false) {
+                    $texto = str_replace(strtolower($badchar[$y]), "", strtolower($texto));
                 }
 
                 $y++;
@@ -94,18 +89,12 @@ class General
             $texto = addslashes($texto); //Adiciona barras invertidas a uma string
             $texto = htmlspecialchars($texto); //Evita ataques XSS
             return $texto;
-
-        }
-        else
-        {
-
+        } else {
             return $texto;
         }
-
     }
 
-    function __destruct()
+    public function __destruct()
     {
     }
-
 }

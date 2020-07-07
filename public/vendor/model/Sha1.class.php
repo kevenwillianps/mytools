@@ -24,7 +24,5 @@ class Sha1
 
         /** Retorno o texto codificado **/
         return sha1($this->text);
-
     }
-
 }

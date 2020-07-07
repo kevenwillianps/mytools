@@ -13,8 +13,7 @@ use \vendor\model\Cpf;
 /** Instânciamento da classe 'CPF' **/
 $Cpf = new Cpf;
 
-try
-{
+try {
 
     /** Result **/
     $result = [
@@ -26,10 +25,7 @@ try
 
     /** Paro o procedimento **/
     exit;
-
-}
-catch(Exception $e)
-{
+} catch (Exception $e) {
 
     /** Preparo o formulario para retorno **/
     $result = [
@@ -42,5 +38,4 @@ catch(Exception $e)
 
     /** Paro o procedimento **/
     exit;
-
 }

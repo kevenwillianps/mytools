@@ -15,7 +15,7 @@ class Base64
 
     /**
      * Codifica o Texto de Entrada
-     ***/
+     **/
     public function encode($text)
     {
 
@@ -24,12 +24,11 @@ class Base64
 
         /** Retorno o texto codificado **/
         return base64_encode($this->text);
-
     }
 
     /**
      * Decodifica o Texto de Entrada
-     ***/
+     **/
     public function decode($text)
     {
 
@@ -38,7 +37,5 @@ class Base64
 
         /** Retorno o texto codificado **/
         return base64_decode($this->text);
-
     }
-
 }

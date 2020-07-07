@@ -1,60 +1,71 @@
 <?php
-try{
+/**
+ * Created by MyCode
+ * User: KEVEN
+ * Date: 07/05/2020
+ * Time: 20:35
+ **/
 
-   /**
-    * Created by MyCode
-    * User: KEVEN
-    * Date: 07/05/2020
-    * Time: 20:35
-   **/
+/** Escolho as classes que irei utilizar **/
+use \vendor\model\Main;
+use \vendor\model\Js;
 
-   /** Instânciamento da classe Files  **/
-   $Js = $Main->LoadClass('Js');
+/** Instânciamento das classes **/
+$main = new Main();
+$js = new Js();
 
-   /** Capturo meus campos envios por json **/
-   $inputs = json_decode(file_get_contents('php://input'), true);
+try {
 
-   /** Parâmetros de entrada **/
-   $text = isset($inputs['inputs']['text']) ? (string)$Main->anti_injection($inputs['inputs']['text'], 'S') : 0;
+    /** Capturo meus campos envios por json **/
+    $inputs = json_decode(file_get_contents('php://input'), true);
 
-   /** Controle de erros **/
-   $error   = 0;
-   $message = array();
+    /** Parâmetros de entrada **/
+    $text = isset($inputs['inputs']['text']) ? (string)$main->antiInjection($inputs['inputs']['text'], 'S') : 0;
 
-   if($error > 0){
+    /** Controle de erros **/
+    $message = array();
+
+    /** Verifico se o campo foi preenchido **/
+    if (empty($text)){
+
+        array_push($message, "O campo 'Texto', deve ser preenchido");
+
+    }
+
+    if (count($message)> 0)
+    {
 
        /** Preparo o formulario para retorno **/
-       $result = array("message" => $message);
+        $result = array("message" => $message);
 
-       /**Envio*/
-       echo json_encode($result);
+        /**Envio*/
+        echo json_encode($result);
 
-       /**Para o procedimento*/
-       exit;
+        /**Para o procedimento*/
+        exit;
 
-   }else{
+    }
+    else
+    {
 
-       /** Executo determinado método **/
-       /** Result **/
-       $result = array("result" => $Js->minifyJS($text));
+        /** Result **/
+        $result = array("result" => $js->minifyJS($text));
 
-       /** Envio **/
-       echo json_encode($result);
+        /** Envio **/
+        echo json_encode($result);
 
-       /** Paro o procedimento **/
-       exit;
-
-   }
-
-}catch(Exception $e){
+        /** Paro o procedimento **/
+        exit;
+    }
+} catch (Exception $e)
+{
 
    /** Preparo o formulario para retorno **/
-   $result = array("cod" => 0, "message" => $e->getMessage());
+    $result = array("cod" => 0, "message" => $e->getMessage());
 
-   /** Envio **/
-   echo json_encode($result);
+    /** Envio **/
+    echo json_encode($result);
 
-   /** Paro o procedimento **/
-   exit;
-
+    /** Paro o procedimento **/
+    exit;
 }

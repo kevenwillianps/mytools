@@ -15,8 +15,7 @@ use \vendor\model\Main;
 $cnpj = new Cnpj();
 $main = new Main();
 
-try
-{
+try {
 
     /** Executo determinado método **/
     /** Result **/
@@ -27,16 +26,14 @@ try
 
     /** Paro o procedimento **/
     exit;
-
-}catch(Exception $e){
+} catch (Exception $e) {
 
    /** Preparo o formulario para retorno **/
-   $result = array("message" => $e->getMessage());
+    $result = array("message" => $e->getMessage());
 
-   /** Envio **/
-   echo json_encode($result);
+    /** Envio **/
+    echo json_encode($result);
 
-   /** Paro o procedimento **/
-   exit;
-
+    /** Paro o procedimento **/
+    exit;
 }

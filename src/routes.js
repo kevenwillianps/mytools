@@ -15,6 +15,10 @@ import JSMinify from './components/Web/JS/js_minify'
 
 /** Importo os Componentes do Correios **/
 import FreteCalculate from './components/Correios/frete_calculate'
+
+/** Importo os Componentes de Edição de Texto **/
+import EdicaoRapida from './components/Texto/edica_rapida'
+
 const routes = [
 
     {
@@ -86,6 +90,15 @@ const routes = [
         path      : '/correios/frete/calcular/',
         component : FreteCalculate,
         name      : 'frete-calculate',
+
+    },
+
+    {
+
+        /** Página Para Editar Texto Sem Login **/
+        path      : '/texto/edicao/rapida/',
+        component : EdicaoRapida,
+        name      : 'edicao-rapida',
 
     },
 

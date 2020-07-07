@@ -42,5 +42,4 @@ class Css
 
         return preg_replace($find, $repl, $this->text);
     }
-
 }

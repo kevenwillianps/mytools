@@ -4,7 +4,6 @@
 
         <div class="wrapper">
 
-            <!-- Sidebar  -->
             <nav id="sidebar" class="shadow-sm">
 
                 <div class="sidebar-header">
@@ -18,6 +17,40 @@
                 </div>
 
                 <ul class="list-unstyled components">
+
+                    <li>
+
+                        <a href="#Texto" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+
+                            📔 Texto
+
+                        </a>
+
+                        <ul class="collapse list-unstyled" id="Texto">
+
+                            <li>
+
+                                <router-link to="/texto/edicao/rapida/">
+
+                                    Edição Rápida
+
+                                </router-link>
+
+                            </li>
+
+                            <li>
+
+                                <router-link to="/pessoal/edicao/segura/">
+
+                                    Edição Segura
+
+                                </router-link>
+
+                            </li>
+
+                        </ul>
+
+                    </li>
 
                     <li>
 
@@ -175,7 +208,7 @@
 
                     <li>
 
-                        <a href="https://github.com/" class="download" target="_blank">
+                        <a href="https://github.com/kevenwillianps/mytools" class="download" target="_blank">
 
                             Github
 

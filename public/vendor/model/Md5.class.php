@@ -21,7 +21,6 @@ class Md5
 
         /** Criação dos objetos **/
         $this->text = null;
-
     }
 
     /**
@@ -35,7 +34,5 @@ class Md5
 
         /** Retorno o texto codificado **/
         return md5($this->text);
-
     }
-
 }

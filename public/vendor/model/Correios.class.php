@@ -25,7 +25,6 @@ class Correios
 
     public function __construct()
     {
-
         $this->cod_servico     = 0;
         $this->cep_origem      = 0;
         $this->cep_destino     = 0;
@@ -34,7 +33,6 @@ class Correios
         $this->comprimento     = 0;
         $this->peso            = 0;
         $this->valor_declarado = 0;
-
     }
 
     /**
@@ -74,18 +72,12 @@ class Correios
 
         $_arr_ = array();
 
-        if($xml->cServico->Erro == '0') {
-
+        if ($xml->cServico->Erro == '0') {
             $_arr_[0] = $xml->cServico;
 
             return $_arr_;
-
-        }else {
-
+        } else {
             return false;
-
         }
-
     }
-
 }

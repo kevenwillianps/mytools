@@ -15,12 +15,10 @@ namespace vendor\model;
 
 class Main
 {
-
-    function antiInjection($str, $long = '')
+    public function antiInjection($str, $long = '')
     {
-        //Check
-        if ((!is_array($str)) && $long != 'S')
-        {
+
+        if ((!is_array($str)) && $long != 'S') {
 
             $badchar[1] = " drop ";
             $badchar[2] = " select ";
@@ -49,15 +47,19 @@ class Main
 
             $y = 1;
             $x = sizeof($badchar);
-            while ($y <= $x)
-            {
-                $pos = strpos(strtolower($str) , strtolower($badchar[$y]));
-                if ($pos !== false)
-                {
-                    $str = str_replace(strtolower($badchar[$y]) , "", strtolower($str));
+
+            while ($y <= $x) {
+
+                $pos = strpos(strtolower($str), strtolower($badchar[$y]));
+
+                if ($pos !== false) {
+
+                    $str = str_replace(strtolower($badchar[$y]), "", strtolower($str));
+
                 }
 
                 $y++;
+
             }
 
             $str = trim($str); //limpa espaços vazio
@@ -66,15 +68,16 @@ class Main
             $str = htmlspecialchars($str); //Evita ataques XSS
             return utf8_decode($str);
 
-        }
-        elseif ((!is_array($str)) && $long == 'S')
-        {
+        } elseif ((!is_array($str)) && $long == 'S') {
+
             return utf8_decode(addslashes($str));
-        }
-        else
-        {
+
+        } else {
+
             return $str;
+
         }
+
     }
 
 }

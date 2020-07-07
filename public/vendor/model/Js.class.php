@@ -7,15 +7,16 @@
  * Time: 13:20
  **/
 
+/** Informo o local que a classes esta localizada **/
+namespace vendor\model;
+
 class Js
 {
 
     /** Comprimir js **/
     public function minifyJS($str)
     {
-
         return preg_replace(
-
             array(
 
                 '!/\*.*?\*/!s',
@@ -25,7 +26,8 @@ class Js
                 "/\n\}(.+?)\n/",
                 "/;\n/"
 
-            ), array(
+            ),
+            array(
 
                 '',
                 "\n",
@@ -34,7 +36,8 @@ class Js
                 "}\\1\n",
                 ';'
 
-            ), $str);
+            ),
+            $str
+        );
     }
-
 }

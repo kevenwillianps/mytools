@@ -15,20 +15,21 @@ class Formatter
     // helpers:
     private static function PrettyPrint($t)
     {
-        if (count($t) == 3)
+        if (count($t) == 3) {
             echo token_name($t[0]) . "\t\t[" . $t[1] . ']';
-        else
+        } else {
             echo $t[0];
+        }
         echo "\n";
     }
 
     // normalize the individual rows from token_get_all
-    static function Tokenize($t)
+    public static function Tokenize($t)
     {
         return array($t[0], count($t) == 3 ? $t[1] : $t[0]);
     }
     // calculate the actual length of a string using a 4-space tab versus a 1-char tab
-    static function SmartLen($str)
+    public static function SmartLen($str)
     {
         return strlen($str) + substr_count($str, "\t") * 3; // 4-space tab
     }
@@ -36,7 +37,7 @@ class Formatter
     // let's get started :)
     private static $linelen = 96;
     private $code;
-    function __construct($code)
+    public function __construct($code)
     {
         $this->code = $code;
     }
@@ -53,8 +54,9 @@ class Formatter
         $ternary = 0;
         $newline = function ($char, $before = false) use (&$tabs, &$oneliner) {
             return function ($requirews = '') use (&$tabs, &$oneliner, $char, $before) {
-                if ($oneliner)
+                if ($oneliner) {
                     return $requirews;
+                }
                 return ($before ? "\n" . str_repeat("\t", max($tabs, 0)) : '') . $char . "\n" .
                     str_repeat("\t", max($tabs, 0));
             };
@@ -65,10 +67,8 @@ class Formatter
         // unindent by on closing brackets.
         $controls = array(0);
         $controlbrackets = array();
-        $control = function ($keyword) use
-        (&$lastcontrol, &$controls, &$controlbrackets, &$brackets) {
-            return function ($v, $t) use
-            (&$lastcontrol, &$controls, &$controlbrackets, &$lambda, &$brackets, $keyword) {
+        $control = function ($keyword) use (&$lastcontrol, &$controls, &$controlbrackets, &$brackets) {
+            return function ($v, $t) use (&$lastcontrol, &$controls, &$controlbrackets, &$lambda, &$brackets, $keyword) {
                 $lastcontrol = $t;
                 $lambda = false;
                 $controls[count($controls) - 1]++;
@@ -82,8 +82,9 @@ class Formatter
             // unindent as many as needed
             $lastcontrol = false;
 
-            while(count($controls) > 1 && $controls[count($controls) - 1] == 0)
-                array_pop($controls); // get rid of empty states
+            while (count($controls) > 1 && $controls[count($controls) - 1] == 0) {
+                array_pop($controls);
+            } // get rid of empty states
             $tabs -= array_pop($controls);
             $controls[] = 0; // re-add the last frame on
             array_pop($controlbrackets);
@@ -149,8 +150,9 @@ class Formatter
                 // class type-hinting
                 if (isset($tokens[$i + 2]) && ($tokens[$i + 1][0] == T_VARIABLE ||
                         ($tokens[$i + 1][0] == T_WHITESPACE &&
-                            $tokens[$i + 2][0] == T_VARIABLE)))
+                            $tokens[$i + 2][0] == T_VARIABLE))) {
                     return $v . ' ';
+                }
 
                 // static scope
                 return $v;
@@ -158,16 +160,17 @@ class Formatter
                 return rtrim($v) . (substr($v, - 2) == '*/' ||
                     substr($v, - 1) == "\n" ? $blankline() : '');
             }, T_RETURN => function ($v, $t, $tokens, $i) use (&$tabs) {
-                if ($tokens[$i + 1][0] == ';')
+                if ($tokens[$i + 1][0] == ';') {
                     return 'return';
+                }
 
                 return 'return ';
-            }, T_IF => $control('if '), T_ELSE => function ($v, $t, $tokens, $i) use
-            (&$lastcontrol, $control, &$tabs, $blankline) {
+            }, T_IF => $control('if '), T_ELSE => function ($v, $t, $tokens, $i) use (&$lastcontrol, $control, &$tabs, $blankline) {
                 // if we're followed by an "if" (i.e. we're an else-if), don't handle it
                 if ($tokens[$i + 1][0] == T_IF ||
-                    ($tokens[$i + 1][0] == T_WHITESPACE && $tokens[$i + 2][0] == T_IF))
+                    ($tokens[$i + 1][0] == T_WHITESPACE && $tokens[$i + 2][0] == T_IF)) {
                     return 'else ';
+                }
 
                 // normal else, treat it like an immediate control statement
                 $else = $control('else');
@@ -177,8 +180,7 @@ class Formatter
                 $lastcontrol = T_ELSE + 200000;
                 $tabs++;
                 return 'else' . $blankline(' ');
-            }, T_TRY => function ($v, $t, $tokens, $i) use
-            (&$lastcontrol, $control, &$tabs, $blankline) {
+            }, T_TRY => function ($v, $t, $tokens, $i) use (&$lastcontrol, $control, &$tabs, $blankline) {
 
                 // immediate control statement
                 $try = $control('try');
@@ -188,8 +190,7 @@ class Formatter
                 $lastcontrol = T_TRY + 200000;
                 $tabs++;
                 return 'try' . $blankline(' ');
-            }, T_CATCH => $control('catch'), T_DO => function ($v, $t, $tokens, $i) use
-            (&$lastcontrol, &$control, &$tabs, $blankline) {
+            }, T_CATCH => $control('catch'), T_DO => function ($v, $t, $tokens, $i) use (&$lastcontrol, &$control, &$tabs, $blankline) {
                 // treat "do" just like "else"
                 $do = $control('do');
                 $do($v, $t, $tokens, $i);
@@ -199,40 +200,35 @@ class Formatter
 
                 return 'do ';
             }, T_WHILE => $control('while'), T_FOR => $control('for'), T_CLASS => $control(
-                'class '),
-            T_FUNCTION => function ($v, $t, $tokens, $i) use
-            ($control, &$lambda, &$brackets, &$controlbrackets) {
+                'class '
+            ),
+            T_FUNCTION => function ($v, $t, $tokens, $i) use ($control, &$lambda, &$brackets, &$controlbrackets) {
                 $func = $control('function ');
                 $ret = $func($v, $t, $tokens, $i);
 
                 // need to special-handle lambdas here. if there's anything preceeding this
                 // function that's a dollar sign, then we need to leave the bracket on us.
                 $lambda = false;
-                for($tempi = $i; $tempi >= 0 && !$lambda; $tempi--)
-                {
+                for ($tempi = $i; $tempi >= 0 && !$lambda; $tempi--) {
                     list($tempt, $tempv) = Formatter::Tokenize($tokens[$tempi]);
 
-                    if (strpos($tempv, "\n") !== false)
+                    if (strpos($tempv, "\n") !== false) {
                         break;
-                    else if (strpos($tempv, "$") !== false || strpos($tempv, '(') !== false ||
-                        strpos($tempv, '=') !== false || $tempt == T_RETURN)
+                    } elseif (strpos($tempv, "$") !== false || strpos($tempv, '(') !== false ||
+                        strpos($tempv, '=') !== false || $tempt == T_RETURN) {
                         $lambda = true;
+                    }
                 }
 
                 return $ret;
-            }, T_FOREACH => $control('foreach'), '{' => function () use
-            (&$lastcontrol, &$controls, &$tabs, &$lambda, $blankline) {
-
+            }, T_FOREACH => $control('foreach'), '{' => function () use (&$lastcontrol, &$controls, &$tabs, &$lambda, $blankline) {
                 $pre = '';
                 // one exception to using the control statement as the indenter is the class
                 // declaration, where there aren't any normal brackets. so we do it here.
-                if ($lastcontrol == T_CLASS)
-                {
+                if ($lastcontrol == T_CLASS) {
                     $tabs++;
                     $pre = $blankline();
-                }
-                else if ($lambda)
-                {
+                } elseif ($lambda) {
                     $tabs++; // normal control statement
                     $pre = ' ';
                     $lambda = false;
@@ -246,8 +242,7 @@ class Formatter
 
                 // handle brackets in expressions versus in statements
                 if (isset($tokens[$i + 1]) && ($tokens[$i + 1] == ';' ||
-                        $tokens[$i + 1] == ',' || $tokens[$i + 1] == ')'))
-                {
+                        $tokens[$i + 1] == ',' || $tokens[$i + 1] == ')')) {
                     $lambda = false;
                     return '}';
                 }
@@ -262,40 +257,42 @@ class Formatter
                 $brackets--;
 
                 if ($brackets == end($controlbrackets) && $lastcontrol > 0 &&
-                    $lastcontrol < 200000 && !$lambda)
-                {
+                    $lastcontrol < 200000 && !$lambda) {
                     $tabs++;
                     $lastcontrol += 200000;
 
                     // if we're followed by a comment before a newline, do not add a newline.
                     // also, if we're followed by a semicolon, don't add a newline or space.
-                    if (isset($tokens[$i + 1]) && $tokens[$i + 1][0] == ';')
+                    if (isset($tokens[$i + 1]) && $tokens[$i + 1][0] == ';') {
                         return ')';
-                    else if ((isset($tokens[$i + 1]) && $tokens[$i + 1][0] == T_COMMENT) ||
+                    } elseif ((isset($tokens[$i + 1]) && $tokens[$i + 1][0] == T_COMMENT) ||
                         (isset($tokens[$i + 2]) && $tokens[$i + 1][0] ==
                             T_WHITESPACE && strpos($tokens[$i + 1][1], "\n") ===
-                            false && $tokens[$i + 2][0] == T_COMMENT))
+                            false && $tokens[$i + 2][0] == T_COMMENT)) {
                         return ') ';
+                    }
                     return ')' . $blankline();
                 }
 
                 return ')';
-            }, ';' => function ($v, $t, $tokens, $i) use
-            (&$lastcontrol, $uncontrol, $blankline) {
+            }, ';' => function ($v, $t, $tokens, $i) use (&$lastcontrol, $uncontrol, $blankline) {
                 // if this is a one-line control statement, unindent
-                if ($lastcontrol >= 200000)
+                if ($lastcontrol >= 200000) {
                     $uncontrol();
+                }
 
                 // if we're followed by a comment before a newline, do not add a newline.
                 if ((isset($tokens[$i + 1]) && $tokens[$i + 1][0] == T_COMMENT) || (isset(
                             $tokens[$i + 2]) && $tokens[$i + 1][0] ==
                         T_WHITESPACE && strpos($tokens[$i + 1][1], "\n") === false &&
-                        $tokens[$i + 2][0] == T_COMMENT))
+                        $tokens[$i + 2][0] == T_COMMENT)) {
                     return '; ';
+                }
 
                 // for loops are the obvious exception where semicolons are allowed in-line
-                if ($lastcontrol == T_FOR)
+                if ($lastcontrol == T_FOR) {
                     return '; ';
+                }
 
                 // otherwise, add a line after this statement
                 return ';' . $blankline(' ');
@@ -303,28 +300,28 @@ class Formatter
                 $ternary++;
                 return ' ? ';
             }, ':' => function () use (&$ternary) {
-                if ($ternary > 0)
-                {
+                if ($ternary > 0) {
                     $ternary--;
                     return ' : ';
                 }
                 // non-ternary, do not pad the colon (e.g. alt control syntax)
                 return ': ';
-            }, T_OPEN_TAG => function ($v, $t, $tokens, $i) use
-            (&$tabs, &$oneliner, $blankline) {
+            }, T_OPEN_TAG => function ($v, $t, $tokens, $i) use (&$tabs, &$oneliner, $blankline) {
                 // unfortunately, the open tag INCLUDES the trailing newline if there is one.
                 // so we need to look ahead and maintain newlines appropriately
                 $oneliner = false;
                 if ($tokens[$i + 1][0] == T_WHITESPACE &&
-                    strpos($tokens[$i + 1][1], "\n") !== false && strpos($v, "\n") !== false)
+                    strpos($tokens[$i + 1][1], "\n") !== false && strpos($v, "\n") !== false) {
                     return '<' . '?php' . $blankline() . $blankline();
+                }
 
                 $oneliner = true;
                 return '<' . '?php ';
             }, T_CLOSE_TAG => function ($v, $t, $tokens, $i) use (&$oneliner, $blankline) {
                 // as with the open tag, the closing tag includes the trailing newline.
-                if (strpos($v, "\n") !== false)
+                if (strpos($v, "\n") !== false) {
                     return '?>' . $blankline("\n");
+                }
 
                 return '?>';
             }, T_WHITESPACE => function ($v) use (&$tabs, $blankline) {
@@ -334,8 +331,14 @@ class Formatter
                 // indented lines. we will then re-add all standard whitespace that we actually
                 // want directly, ensuring consistency
                 return str_replace("\r", $blankline(), str_replace("\n", '', str_replace(
-                    "\n\n", "\r", str_replace(array("\t", ' ', "\r"), '',
-                    $v))));
+                    "\n\n",
+                    "\r",
+                    str_replace(
+                        array("\t", ' ', "\r"),
+                        '',
+                        $v
+                    )
+                )));
             }, T_INLINE_HTML => '$$',
             // handled separately
         );
@@ -347,18 +350,20 @@ class Formatter
         $cleanup = function ($v, $token) {
             return str_replace("\r", '', $v);
         };
-        foreach($tokens as $i => $t)
-        {
+        foreach ($tokens as $i => $t) {
             list($token, $val) = self::Tokenize($t);
             $val = $cleanup($val, $token);
 
-            if (!isset($replacements[$token]))
+            if (!isset($replacements[$token])) {
                 $ret .= $val;
-            else
-            {
+            } else {
                 $transformation = $replacements[$token];
-                $ret .= is_callable($transformation) ? $transformation($val, $token, $tokens,
-                    $i) : str_replace('$$', strval($val), $transformation);
+                $ret .= is_callable($transformation) ? $transformation(
+                    $val,
+                    $token,
+                    $tokens,
+                    $i
+                ) : str_replace('$$', strval($val), $transformation);
             }
         }
 
@@ -389,39 +394,35 @@ class Formatter
         $opstack = array();
         $broken = false;
 
-        for($tokeni = 0; $tokeni < count($tokens); $tokeni++)
-        {
+        for ($tokeni = 0; $tokeni < count($tokens); $tokeni++) {
             list($token, $val) = self::Tokenize($tokens[$tokeni]);
             $final[] = $val;
 
             //
             if (($token == T_WHITESPACE && strpos($val, "\n") !== false) ||
                 ($token == T_COMMENT && substr($val, - 1) == "\n") ||
-                ($token == T_OPEN_TAG && substr($val, - 1) == "\n"))
-            {
+                ($token == T_OPEN_TAG && substr($val, - 1) == "\n")) {
                 // re-balance the previous line now that we have complete info. basically, we
                 // just make certain operators "greedy" in that if we can keep them together
                 // without adding more lines, we'll do it. (this is purely asthetic, but then
                 // again, isn't all formatting?)
                 $valid = function ($chunks, $maxlen) {
                     $len = 0;
-                    foreach($chunks as $chunk)
-                    {
-                        if (strpos($chunk, "\n") !== false)
-                        {
+                    foreach ($chunks as $chunk) {
+                        if (strpos($chunk, "\n") !== false) {
                             $len += Formatter::SmartLen(current(explode("\n", $chunk)));
-                            if ($len > $maxlen)
+                            if ($len > $maxlen) {
                                 return false;
+                            }
 
                             // restart
                             $len = Formatter::SmartLen(end(explode("\n", $chunk)));
-                        }
-                        else
-                        {
+                        } else {
                             $len += Formatter::SmartLen($chunk);
 
-                            if ($len > $maxlen)
+                            if ($len > $maxlen) {
                                 return false;
+                            }
                         }
                     }
                     return true;
@@ -436,8 +437,7 @@ class Formatter
                 $slice = array_slice($final, $lastorgline, count($final) - $lastorgline - 1);
                 $breaksadded = $findlines($slice);
                 $bslen = count($breaksadded);
-                if ($bslen > 0 && $valid($slice, self::$linelen))
-                {
+                if ($bslen > 0 && $valid($slice, self::$linelen)) {
                     // we're going to try each of " (", "||", and "&&" for additional
                     // breakage, stopping if we successfully change the string. basically, if
                     // there's a bracket following a space, we re-bias the line against that.
@@ -446,9 +446,8 @@ class Formatter
                     // that try again with && (again since most if statements are just &&)
                     $changes = 0;
                     $ops = array('(', '||', '&&');
-                    for($opsi = 0, $opslen = count($ops); !$changes &&
-                    $opsi < $opslen; $opsi++)
-                    {
+                    for ($opsi = 0, $opslen = count($ops); !$changes &&
+                    $opsi < $opslen; $opsi++) {
                         // clone the slice for this iteration
                         $ts = $slice;
                         // only make one change at a time, to avoid index munging (this may
@@ -462,35 +461,32 @@ class Formatter
                             // been forgotten. so, let's move the LAST newline to after the
                             // preceeding operator.
                             $bsa = array_keys(array_reverse($breaksadded, true));
-                            for($bsk = 0; !$modified && $bsk < $bslen; $bsk++)
-                            {
+                            for ($bsk = 0; !$modified && $bsk < $bslen; $bsk++) {
                                 $bsi = $bsa[$bsk];
 
                                 $orgline = $ts[$bsi];
                                 $ts[$bsi] = rtrim($orgline, "\n\t");
                                 $lineform = str_replace("\n\t", "\n", substr($orgline, strlen(
-                                    $ts[$bsi])));
-                                if (empty($ts[$bsi]))
+                                    $ts[$bsi]
+                                )));
+                                if (empty($ts[$bsi])) {
                                     $ts[$bsi] = ' ';
+                                }
 
-                                for($tsi = $bsi - 1; !$modified && $tsi >= 0; $tsi--)
-                                {
+                                for ($tsi = $bsi - 1; !$modified && $tsi >= 0; $tsi--) {
                                     // bracket preceeded by space is the BEST place to break
                                     if ($ts[$tsi] == $ops[$opsi] &&
-                                        strlen(trim($ts[$tsi - 1])) == 0)
-                                    {
+                                        strlen(trim($ts[$tsi - 1])) == 0) {
                                         $before = ($ops[$opsi] == '(' ? 1 : 0);
                                         $ts[$tsi - $before] .= $lineform;
 
                                         if ($valid($ts, self::$linelen) &&
-                                            count($findlines($ts)) <= $bslen)
-                                        {
+                                            count($findlines($ts)) <= $bslen) {
                                             // instead of array_splice'ing, we'll just copy
                                             // what's changed
                                             if ($final[$lastorgline + $tsi - $before] !=
                                                 $ts[$tsi - $before] ||
-                                                $final[$lastorgline + $bsi] != $ts[$bsi])
-                                            {
+                                                $final[$lastorgline + $bsi] != $ts[$bsi]) {
                                                 $final[$lastorgline + $tsi -
                                                 $before] = $ts[$tsi - $before];
                                                 $final[$lastorgline + $bsi] = $ts[$bsi];
@@ -499,54 +495,49 @@ class Formatter
                                                 $changes++;
                                             }
                                         }
-
                                     }
                                 }
                             }
-                        }
-                        while($modified);
+                        } while ($modified);
                     }
                 }
                 $lastorgline = count($final); // reset for next time now set up the NEXT
                 // line: reset the indentation with the whitespace at the end of this line,
                 // or the next whitespace (if we're actually a comment)
                 $indent = end(explode("\n", $val));
-                if (($tokeni + 1) < count($tokens) && $tokens[$tokeni + 1][0] == T_WHITESPACE)
+                if (($tokeni + 1) < count($tokens) && $tokens[$tokeni + 1][0] == T_WHITESPACE) {
                     $indent .= $tokens[$tokeni + 1][1];
+                }
                 $chars = $token == T_COMMENT ? 0 : self::SmartLen($indent);
 
                 $lastchars = 0;
                 $lastop =  - 1;
                 $opstack = array();
-            }
-            else if ($token == T_INLINE_HTML)
-            {
+            } elseif ($token == T_INLINE_HTML) {
                 $lastline = end(explode("\n", $val));
                 $lastchars = $chars = self::SmartLen($lastline);
                 $indent = preg_replace('/[^\t]/', '', $lastline);
-            }
-            else
-            {
+            } else {
                 $chars += self::SmartLen($val);
                 $lastchars += self::SmartLen($val);
 
-                if ($chars >= self::$linelen)
-                {
+                if ($chars >= self::$linelen) {
                     // go back to $lastop and add a newline in the placeholder after it
-                    if ($lastop >= 0)
-                    {
+                    if ($lastop >= 0) {
                         $fullindent = $indent . str_repeat("\t", count($opstack));
 
-                        if (strlen(trim($final[$lastop])) == 0)
+                        if (strlen(trim($final[$lastop])) == 0) {
                             $final[$lastop] = '';
+                        }
 
                         // if we're an "inline" bracket (i.e. a space before), put newline
                         // first
                         if (trim($final[$lastop]) == '(' &&
-                            substr($final[$lastop - 1], - 1) == ' ')
+                            substr($final[$lastop - 1], - 1) == ' ') {
                             $final[$lastop] = "\n" . $fullindent . $final[$lastop];
-                        else
+                        } else {
                             $final[$lastop] .= "\n" . $fullindent;
+                        }
 
                         $lastop =  - 1;
                         $chars = $lastchars + self::SmartLen($fullindent);
@@ -568,32 +559,26 @@ class Formatter
                 // because the expression following the comma is not at the same indentation
                 // level as the temp
                 //
-                if ($token == '(')
-                {
+                if ($token == '(') {
                     // only break on opening brackets that aren't immediately closed (i.e.
                     // empty)
-                    if ($tokens[$tokeni + 1][0] != ')')
-                    {
+                    if ($tokens[$tokeni + 1][0] != ')') {
                         // fake a comma
                         $opstack[] = array(',', $tokeni, 'FAKE(');
                         $lastop = $tokeni;
                         $broken = false;
                     }
-                }
-                else if ($token == ')')
-                {
+                } elseif ($token == ')') {
                     // only break on opening brackets that aren't immediately closed (i.e.
                     // empty)
-                    if ($tokens[$tokeni - 1][0] != '(')
-                    {
+                    if ($tokens[$tokeni - 1][0] != '(') {
                         // go back to the last opening bracket
-                        while(count($opstack) > 0 && end(end($opstack)) != 'FAKE(')
+                        while (count($opstack) > 0 && end(end($opstack)) != 'FAKE(') {
                             array_pop($opstack);
+                        }
                         array_pop($opstack);
                     }
-                }
-                else if ($token == ',')
-                {
+                } elseif ($token == ',') {
                     $lastop = ++$tokeni;
                     $lastchars = 0;
                     $final[] = ' ';
@@ -601,16 +586,18 @@ class Formatter
                     $break = false;
                     // take off all indenting back to the previous comma. if we pass anything
                     // else, then we need a newline.
-                    while(count($opstack) > 0 && current(end($opstack)) != ',')
-                        if (!in_array(current(array_pop($opstack)), array(',')) && $broken)
+                    while (count($opstack) > 0 && current(end($opstack)) != ',') {
+                        if (!in_array(current(array_pop($opstack)), array(',')) && $broken) {
                             $break = true;
+                        }
+                    }
 
-                    if ($break)
-                    {
+                    if ($break) {
                         $fullindent = $indent . str_repeat("\t", count($opstack));
 
-                        if (strlen(trim($final[$lastop])) == 0)
+                        if (strlen(trim($final[$lastop])) == 0) {
                             $final[$lastop] = '';
+                        }
                         $final[$lastop] .= "\n" . $fullindent;
                         $lastop =  - 1;
                         $chars = $lastchars + self::SmartLen($fullindent);
@@ -618,21 +605,21 @@ class Formatter
                         $broken = false;
                     }
                     // if we took everything out, add a comma
-                    if (count($opstack) == 0 || current(end($opstack)) == '(')
+                    if (count($opstack) == 0 || current(end($opstack)) == '(') {
                         $opstack[] = array($token, $tokeni);
-                }
-                else if (in_array($token, array('.', '?', ':', T_BOOLEAN_AND, T_BOOLEAN_OR,
+                    }
+                } elseif (in_array($token, array('.', '?', ':', T_BOOLEAN_AND, T_BOOLEAN_OR,
                     '*', '+', '-', '/', '%', '<', '>', T_IS_NOT_EQUAL, T_IS_EQUAL,
                     T_IS_IDENTICAL, T_IS_NOT_IDENTICAL, T_IS_SMALLER_OR_EQUAL,
-                    T_IS_GREATER_OR_EQUAL, T_DOUBLE_ARROW)))
-                {
+                    T_IS_GREATER_OR_EQUAL, T_DOUBLE_ARROW))) {
                     $lastop = ++$tokeni; // increment to eat the original space
                     $lastchars = 0;
                     $final[] = ' '; // placeholder
                     $chars++; // the space we just added take off any other
                     // non-comma (i.e. temp) operator indent and replace it
-                    if (count($opstack) > 0 && current(end($opstack)) != ',')
+                    if (count($opstack) > 0 && current(end($opstack)) != ',') {
                         array_pop($opstack);
+                    }
                     $opstack[] = array($token, $tokeni);
                 }
             }
@@ -666,87 +653,82 @@ class Formatter
         $commenti = 0;
         $prefix = $indentation = '';
         $len = self::$linelen;
-        $breakwrap = function ($suffix = '') use
-        (&$final, &$commenti, &$comment, &$prefix, &$indentation, $len, $wrap) {
-            $final[$commenti] = $wrap(str_repeat(' ', max(0, Formatter::SmartLen($prefix) -
+        $breakwrap = function ($suffix = '') use (&$final, &$commenti, &$comment, &$prefix, &$indentation, $len, $wrap) {
+            $final[$commenti] = $wrap(
+                str_repeat(' ', max(0, Formatter::SmartLen($prefix) -
                     4)) . $comment,
-                $indentation, $len, $suffix);
+                $indentation,
+                $len,
+                $suffix
+            );
             $prefix = $indentation = $comment = '';
             $commenti = 0;
         };
-        for($i = 0; $i < count($tokens); $i++)
-        {
+        for ($i = 0; $i < count($tokens); $i++) {
             list($token, $val) = self::Tokenize($tokens[$i]);
 
             if ($token == T_COMMENT && substr($val, 0, 3) == '// ' &&
-                !in_array(substr($val, 3, 1), array("\n", "\t", ' ')))
-            {
+                !in_array(substr($val, 3, 1), array("\n", "\t", ' '))) {
                 // OK, we're an eligible comment. tack it on, and track it if we're starting
-                if (empty($comment))
-                {
+                if (empty($comment)) {
                     $final[] = "// PLACEHOLDER\n";
                     $commenti = count($final) - 1;
 
                     // go back and find the appropriate indentation. if it wasn't immediate,
                     // add a tab to it since it's carried-over.
                     $prefix = $indentation = '';
-                    for($k = $i - 1; $k >= 0; $k--)
-                    {
+                    for ($k = $i - 1; $k >= 0; $k--) {
                         list($kt, $kv) = self::Tokenize($tokens[$k]);
                         // if it's whitespace containing a new line, use its tabs.
-                        if ($kt == T_WHITESPACE && strpos($kv, "\n") !== false)
-                        {
+                        if ($kt == T_WHITESPACE && strpos($kv, "\n") !== false) {
                             $indentation = end(explode("\n", $kv));
-                            if ($k != $i - 1)
+                            if ($k != $i - 1) {
                                 $indentation .= "\t";
+                            }
                             break;
                         }
                         // if it's a newline-holding other token, use the next token's tabs
-                        else if ((in_array($kt, array(T_COMMENT, T_WHITESPACE, T_OPEN_TAG,
-                                T_CLOSE_TAG)) && strpos($kv, "\n") !== false))
-                        {
+                        elseif ((in_array($kt, array(T_COMMENT, T_WHITESPACE, T_OPEN_TAG,
+                                T_CLOSE_TAG)) && strpos($kv, "\n") !== false)) {
                             list($kt1, $kv1) = self::Tokenize($tokens[$k + 1]);
-                            if ($kt1 == T_WHITESPACE)
-                            {
+                            if ($kt1 == T_WHITESPACE) {
                                 $indentation = $kv1;
                                 break;
                             }
                         }
 
-                        if ($kt != T_COMMENT)
-                            $prefix .= $kv; // backwards, but we only care about length
+                        if ($kt != T_COMMENT) {
+                            $prefix .= $kv;
+                        } // backwards, but we only care about length
                     }
-                }
-                else if (current($tokens[$i - 1]) == T_WHITESPACE)
-                    array_pop($final); // remove the whitespace between comments.
+                } elseif (current($tokens[$i - 1]) == T_WHITESPACE) {
+                    array_pop($final);
+                } // remove the whitespace between comments.
                 $comment .= $val;
                 $val = ''; // mark val as "handled" so it doesn't get added
-            }
-            else if (!empty($comment) && ($token == T_WHITESPACE && (strpos($val, "\n\n") !==
+            } elseif (!empty($comment) && ($token == T_WHITESPACE && (strpos($val, "\n\n") !==
                         false) ||
                     ($i > 0 && strpos($val, "\n") !== false &&
-                        substr(end(self::Tokenize($tokens[$i - 1])), - 1) == "\n")))
-            {
+                        substr(end(self::Tokenize($tokens[$i - 1])), - 1) == "\n"))) {
                 // double newline: break.
                 $breakwrap("");
-            }
-            else if ($token != T_WHITESPACE && !empty($comment))
-            {
+            } elseif ($token != T_WHITESPACE && !empty($comment)) {
                 // not a comment (or not an eligible comment), so we have one to process.
                 // place it accordingly.
                 $breakwrap();
             }
 
             //
-            if (strlen($val) > 0)
+            if (strlen($val) > 0) {
                 $final[] = $val;
+            }
         }
 
         return implode('', $final);
     }
 
     // format HTML to be indented logically
-    function formatHTML($code)
+    public function formatHTML($code)
     {
         // formatting HTML is considerably more permissive. lines won't be broken or
         // reformatted, just indented correctly, and excessive whitespace may be removed.
@@ -772,137 +754,111 @@ class Formatter
 
         $cur = &$ret;
         $tokens = token_get_all($code);
-        foreach($tokens as $token)
-        {
+        foreach ($tokens as $token) {
             list($token, $val) = self::Tokenize($token);
 
-            if ($token == T_INLINE_HTML || $token == T_CLOSE_TAG)
-            {
-                if ($token == T_CLOSE_TAG)
-                {
+            if ($token == T_INLINE_HTML || $token == T_CLOSE_TAG) {
+                if ($token == T_CLOSE_TAG) {
                     // eat the closing tag and process the newline as HTML.
                     $cur .= '?>';
                     $val = substr($val, 2);
                 }
-                for($i = 0, $len = strlen($val); $i < $len; $i++)
-                {
+                for ($i = 0, $len = strlen($val); $i < $len; $i++) {
                     $ch = $val[$i];
 
                     // handle whitepsace
-                    if ($ch == "\n")
-                    {
+                    if ($ch == "\n") {
                         // ignore newlines in tags
-                        if (is_null($opentag))
-                        {
+                        if (is_null($opentag)) {
                             // everything following the newline is leading whitespace
                             $lws = true;
 
                             // add a new tagline on the newline if we had tags before. if we
                             // closed a tag but still have open tags, clear them now.
-                            if (count(end($tags)) > 0)
-                            {
-                                if ($closed > 0)
-                                {
-                                    foreach(end($tags) as $tag)
-                                    {
+                            if (count(end($tags)) > 0) {
+                                if ($closed > 0) {
+                                    foreach (end($tags) as $tag) {
                                         $ret .= '</' . $tag . '>';
                                         $forced[] = $tag;
                                         $unindent = true;
                                     }
                                     // replace the whole tagline with a new empty one
                                     $tags[count($tags) - 1] = array();
-                                }
-                                else
-                                {
+                                } else {
                                     // tack on a new layer
                                     $tags[count($tags)] = array();
                                 }
                             }
-                            if ($unindent)
-                            {
+                            if ($unindent) {
                                 // unindent the previous line (the line that's ending) by the
                                 // number of tags we closed.
-                                $ret = substr($ret, 0, $lastnewline + 1) . substr($ret,
-                                        $lastnewline + 2);
+                                $ret = substr($ret, 0, $lastnewline + 1) . substr(
+                                    $ret,
+                                    $lastnewline + 2
+                                );
                             }
 
                             // and add a new line and mark it
                             $lastnewline = strlen($ret);
-                            if (!empty($script))
+                            if (!empty($script)) {
                                 $script .= $newline();
-                            else
+                            } else {
                                 $ret .= $newline();
+                            }
                             $closed = 0;
                             $unindent = false;
                         }
-                    }
-                    else if ($ch == ' ')
-                    {
+                    } elseif ($ch == ' ') {
                         // allow all non-leading spaces
-                        if (!$lws)
+                        if (!$lws) {
                             $cur .= ' ';
-                    }
-                    else if ($ch == "\t")
-                    {
+                        }
+                    } elseif ($ch == "\t") {
                         // allow "content" tabs
-                        if (!$lws)
+                        if (!$lws) {
                             $cur .= "\t";
-                    }
-                    else if ($ch == "\r")
+                        }
+                    } elseif ($ch == "\r")
                         ; // just strip carriage-returns flat out
-                    else
-                    {
+                    else {
                         $lws = false;
 
                         // handle comments
-                        if ($ch == '!' && !is_null($opentag) && empty($opentag))
-                        {
+                        if ($ch == '!' && !is_null($opentag) && empty($opentag)) {
                             $cur = &$ret;
                             $cur .= '<!';
                             $comment = 1;
                             $opentag = null;
-                        }
-                        else if ($ch == '<' && $comment)
-                        {
+                        } elseif ($ch == '<' && $comment) {
                             $comment++;
                             $cur .= $ch;
-                        }
-                        else if ($ch == '>' && $comment)
-                        {
+                        } elseif ($ch == '>' && $comment) {
                             $comment--;
                             $cur .= $ch;
-                            if ($comment == 1)
-                            {
+                            if ($comment == 1) {
                                 $comment = false;
                             }
                         }
                         // handle tags
-                        else if ($ch == '<')
-                        {
+                        elseif ($ch == '<') {
                             $opentag = '';
                             $cur = &$opentag;
-                        }
-                        else if ($ch == '>' && !is_null($opentag))
-                        {
+                        } elseif ($ch == '>' && !is_null($opentag)) {
                             $fulltag = $opentag;
 
-                            if (substr((trim($fulltag)), - 1) == '/')
-                            {
+                            if (substr((trim($fulltag)), - 1) == '/') {
                                 // we don't really have to do much of anything for
                                 // one-liners
                                 $cur = &$ret;
                                 $ret .= '<' . $fulltag . '>';
                                 $opentag = null;
-                            }
-                            else
-                            {
+                            } else {
                                 $tag = current(explode(' ', $fulltag));
                                 $opentag = null;
                                 $cur = &$ret;
 
                                 // handle closing tags first
-                                if (strlen($tag) > 0 && $tag[0] == '/')
-                                {
+                                if (strlen($tag) > 0 && $tag[0] == '/') {
                                     $tag = substr($tag, 1);
 
                                     // in an IDEAL world, all tags would have perfectly
@@ -923,23 +879,19 @@ class Formatter
                                     // closing line will be unindented accordingly. more
                                     // information on that up at the \n handler.
                                     $already = array_search($tag, $forced);
-                                    if ($already !== false)
+                                    if ($already !== false) {
                                         unset($forced[$already]);
-                                    else
-                                    {
+                                    } else {
                                         // first of all, remove the blank one if it exists.
-                                        if (!count(end($tags)))
-                                        {
+                                        if (!count(end($tags))) {
                                             array_pop($tags);
                                             $unindent = true;
                                         }
 
                                         // if we're the correct tag, we're good to go
                                         $last = end(end($tags));
-                                        if ($last == $tag)
-                                        {
-                                            if ($tag == 'script' && !empty($script))
-                                            {
+                                        if ($last == $tag) {
+                                            if ($tag == 'script' && !empty($script)) {
                                                 $js = $this->formatJavascript($script);
                                                 $ret .= str_replace("\n", $newline(), $js) .
                                                     $newline();
@@ -949,70 +901,60 @@ class Formatter
                                                 // some oddities with unindenting. let's just
                                                 // handle that here for brevity.
                                                 $unindent = false;
-                                                if (substr($ret, - 1) == "\t")
+                                                if (substr($ret, - 1) == "\t") {
                                                     $ret = substr($ret, 0, - 1);
+                                                }
                                             }
                                             $ret .= '<' . $fulltag . '>';
                                             array_pop($tags[count($tags) - 1]);
                                             $closed++;
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             // otherwise, go through and close them all
                                             $strip = $missing = array();
                                             $gotit = false;
-                                            for($tli = count($tags) - 1; !$gotit &&
-                                            $tli >= 0; $tli--)
-                                            {
-                                                for($ti = count($tags[$tli]) - 1; !$gotit &&
-                                                $ti >= 0; $ti--)
-                                                {
-                                                    if ($tags[$tli][$ti] == $tag)
+                                            for ($tli = count($tags) - 1; !$gotit &&
+                                            $tli >= 0; $tli--) {
+                                                for ($ti = count($tags[$tli]) - 1; !$gotit &&
+                                                $ti >= 0; $ti--) {
+                                                    if ($tags[$tli][$ti] == $tag) {
                                                         $gotit = true;
+                                                    }
 
                                                     $missing[] = $tags[$tli][$ti];
                                                     $strip[] = array($tli, $ti);
                                                 }
                                             }
-                                            if ($gotit)
-                                            {
-                                                foreach($strip as $taginfo)
-                                                {
+                                            if ($gotit) {
+                                                foreach ($strip as $taginfo) {
                                                     unset($tags[$taginfo[0]][$taginfo[1]]);
-                                                    if (empty($tags[$taginfo[0]]))
+                                                    if (empty($tags[$taginfo[0]])) {
                                                         unset($tags[$taginfo[0]]);
+                                                    }
                                                 }
 
                                                 $ret .= '</' . implode('></', $missing) . '>';
-                                            }
-                                            else
-                                            {
+                                            } else {
                                                 // do nothing: just strip the closing tag
                                                 // that closes a mismatched tag
                                             }
                                         }
                                     }
-                                }
-                                else
-                                {
+                                } else {
                                     $ret .= '<' . $fulltag . '>';
-                                    if ($tag == 'script')
+                                    if ($tag == 'script') {
                                         $cur = &$script;
+                                    }
                                     $tags[count($tags) - 1][] = $tag;
                                     $closed--;
                                 }
                             }
-                        }
-                        else
-                        {
+                        } else {
                             // pass-through to current active buffer
                             $cur .= $ch;
                         }
                     }
                 }
-            }
-            else
-            {
+            } else {
                 // tack on all non-inline HTML tokens as-is to whichever buffer is currently
                 // active (either the return val or the current open tag)
                 $cur .= $val;
@@ -1023,12 +965,11 @@ class Formatter
     }
 
     //
-    function formatJavascript($script)
+    public function formatJavascript($script)
     {
         // if js beautifier is available, let's use it.
-        if (file_exists('jsbeautifier.php'))
-        {
-            require_once ('jsbeautifier.php');
+        if (file_exists('jsbeautifier.php')) {
+            require_once('jsbeautifier.php');
             $jsb = new JSBeautifier();
             $opts = new BeautifierOptions();
 
@@ -1041,10 +982,9 @@ class Formatter
 
     // format all
     private $formatted = null;
-    function format()
+    public function format()
     {
-        if (is_null($this->formatted))
-        {
+        if (is_null($this->formatted)) {
             // PHASE 1: run through the tokens, making the appropriate replacements
             $this->formatted = $this->formatCode($this->code);
 
@@ -1062,7 +1002,7 @@ class Formatter
     }
 
     // Format the code in the specified file (a handy static function to kick things off)
-    static function FormatFile($file)
+    public static function FormatFile($file)
     {
         $f = new Formatter(file_get_contents($file));
 
@@ -1074,16 +1014,18 @@ class Formatter
 $argc = $_SERVER['argc'];
 $argv = $_SERVER['argv'];
 
-if ($argc < 2)
-{
-    printf("Usage: %s input file [output file]\n" . "Input file can be '-' for stdin, " .
+if ($argc < 2) {
+    printf(
+        "Usage: %s input file [output file]\n" . "Input file can be '-' for stdin, " .
         "and output can be '_' for same as input.\n\n",
-        $argv[0]);
+        $argv[0]
+    );
     exit(0);
 }
 
 $out = Formatter::FormatFile($argv[1] == '-' ? 'php://stdin' : $argv[1]);
-if ($argc > 2)
+if ($argc > 2) {
     file_put_contents($argv[2] = '_' ? $argv[1] : $argv[2], $out);
-else
+} else {
     echo $out;
+}
