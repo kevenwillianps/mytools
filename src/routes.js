@@ -19,6 +19,9 @@ import FreteCalculate from './components/Correios/frete_calculate'
 /** Importo os Componentes de Edição de Texto **/
 import EdicaoRapida from './components/Texto/edica_rapida'
 
+/** Importo os Componentes de Edição de Texto **/
+import ImageCompress from './components/Imagem/Comprimir/image_compress'
+
 const routes = [
 
     {
@@ -99,6 +102,15 @@ const routes = [
         path      : '/texto/edicao/rapida/',
         component : EdicaoRapida,
         name      : 'edicao-rapida',
+
+    },
+
+    {
+
+        /** Página Para Comprimir Imagens **/
+        path      : '/imagem/comprimir/',
+        component : ImageCompress,
+        name      : 'image-compress',
 
     },
 

@@ -2,6 +2,7 @@
 
 /** Instânciamento de classes **/
 include_once('./vendor/autoload.php');
+include_once './vendor/model/wideImage/WideImage.php';
 
 /** Parâmetros de entrada **/
 $table = strtolower(isset($_REQUEST['TABLE']) ? htmlspecialchars($_REQUEST['TABLE']) : "");

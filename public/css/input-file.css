@@ -1,3 +1,8 @@
+.border-dashed-default{
+
+    border: 4px dashed #5D9AEA;
+
+}
 .file-drop-area {
     position: relative;
     display: -webkit-box;

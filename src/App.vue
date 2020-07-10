@@ -202,6 +202,30 @@
 
                     </li>
 
+                    <li>
+
+                        <a href="#Imagem" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+
+                            📷 Imagem
+
+                        </a>
+
+                        <ul class="collapse list-unstyled" id="Imagem">
+
+                            <li>
+
+                                <router-link to="/imagem/comprimir/">
+
+                                    Comprimir
+
+                                </router-link>
+
+                            </li>
+
+                        </ul>
+
+                    </li>
+
                 </ul>
 
                 <ul class="list-unstyled CTAs">

@@ -45,3 +45,16 @@ a:focus {
     border-bottom: 1px dashed #ddd;
     margin: 40px 0;
 }
+
+
+.btn-default{
+    color: #fff;
+    background-color: #1a212f;
+    border-color: #1a212f;
+}
+
+.btn-default:hover{
+    color: #fff;
+    background-color: #252e40;
+    border-color: #252e40;
+}
