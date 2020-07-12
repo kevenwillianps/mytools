@@ -18,7 +18,17 @@
 
             <hr class="my-4">
 
-            <div class="form-group" v-if="inputs_file.name.length <= 0">
+            <div class="form-group shadow-sm" v-if="controls.progress_bar">
+
+                <div class="progress">
+
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+
+                </div>
+
+            </div>
+
+            <div class="form-group" v-else-if="inputs_file.name.length <= 0">
 
                 <div class="border-dashed-default rounded">
 
@@ -62,7 +72,7 @@
 
             </div>
 
-            <div class="form-group" v-if="inputs_file.name.length > 0">
+            <div class="form-group" v-else-if="inputs_file.name.length > 0">
 
                 <table class="table table-bordered table-borderless border-dashed-table rounded shadow-sm">
 
@@ -119,13 +129,29 @@
 
             </div>
 
-            <div class="col-md-12 text-right mt-3" v-if="inputs_file.name.length > 0">
+            <div class="form-group">
 
-                <button class="btn btn-default" v-on:click="PrepareForm()">
+                <input type="text" class="form-control" placeholder="Qualidade final da imagem" v-model="inputs.percent_compress"/>
+
+            </div>
+
+            <div class="form-group mt-3">
+
+                <button class="btn btn-default" v-on:click="PrepareForm()" v-if="inputs_file.name.length > 0 && !controls.progress_bar">
 
                     <i class="fas fa-paper-plane"></i> Comprimir
 
                 </button>
+
+            </div>
+
+            <div class="form-group mt-3" v-if="query.file">
+
+                <a class="btn btn-default" v-bind:href="query.file" download>
+
+                    Baixar
+
+                </a>
 
             </div>
 
@@ -151,6 +177,7 @@
                 query : {
 
                     result : null,
+                    file : null,
 
                 },
 
@@ -164,6 +191,16 @@
                     extension: [],
 
                 },
+                inputs : {
+
+                    percent_compress : null,
+
+                },
+                controls : {
+
+                    progress_bar : false,
+
+                }
 
             }
 
@@ -186,21 +223,36 @@
             /** Preparo o formulário para envio **/
             async PrepareForm() {
 
+                /** Ativo a Barra de Processamento **/
+                this.controls.progress_bar = true;
+
                 /** Envio as requisições de acordo com o tamanho da array **/
                 for (let i = 0; i < this.inputs_file.part.length; i++) {
 
                     for (let j = 0; j < this.inputs_file.part[i].length; j++) {
 
-                        await this.SendForm(this.inputs_file.name[i], j, this.inputs_file.part[i][j], this.inputs_file.part[i].length, this.inputs_file.extension[i])
+                        await this.SendForm(this.inputs_file.name[i], j, this.inputs_file.part[i][j], this.inputs_file.part[i].length, this.inputs_file.extension[i], this.inputs.percent_compress)
+
+                            .then(response => {
+
+                                if (response.data.cod == 99){
+
+                                    this.query.file = response.data.file;
+
+                                }
+
+                            })
 
                     }
 
                 }
 
+                this.controls.progress_bar = false;
+
             },
 
             /** Envio uma requisição para o servidor **/
-            SendForm: async(name, pointer, part, length, extension) => {
+            SendForm: async(name, pointer, part, length, extension, percent_compress) => {
 
                 return axios.post('router.php?TABLE=IMAGEM&ACTION=IMAGEM_COMPRIMIR', {
                     inputs: {
@@ -208,7 +260,8 @@
                         pointer: pointer,
                         part: part,
                         length: length,
-                        extension: extension
+                        extension: extension,
+                        percent_compress: percent_compress
                     }
                 });
 

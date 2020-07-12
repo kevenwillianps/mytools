@@ -21,11 +21,12 @@ try {
     $inputs = json_decode(file_get_contents('php://input'), true);
 
     /** Parâmetros de entrada - Controle de Arquivo **/
-    $pointer   = isset($inputs['inputs']['pointer'])   ? (int)$main->antiInjection($inputs['inputs']['pointer'])      : 0;
-    $part      = isset($inputs['inputs']['part'])      ? (string)$main->antiInjection($inputs['inputs']['part'])      : '';
-    $length    = isset($inputs['inputs']['length'])    ? (int)$main->antiInjection($inputs['inputs']['length'])       : 0;
-    $extension = isset($inputs['inputs']['extension']) ? (string)$main->antiInjection($inputs['inputs']['extension']) : '';
-    $name      = isset($inputs['inputs']['name'])      ? (string)$main->antiInjection($inputs['inputs']['name'])      : 'name_' . rand(1, 15);
+    $pointer          = isset($inputs['inputs']['pointer'])          ? (int)$main->antiInjection($inputs['inputs']['pointer'])          : 0;
+    $part             = isset($inputs['inputs']['part'])             ? (string)$main->antiInjection($inputs['inputs']['part'])          : '';
+    $length           = isset($inputs['inputs']['length'])           ? (int)$main->antiInjection($inputs['inputs']['length'])           : 0;
+    $extension        = isset($inputs['inputs']['extension'])        ? (string)$main->antiInjection($inputs['inputs']['extension'])     : '';
+    $name             = isset($inputs['inputs']['name'])             ? (string)$main->antiInjection($inputs['inputs']['name'])          : 'name_' . rand(1, 15);
+    $percent_compress = isset($inputs['inputs']['percent_compress']) ? (int)$main->antiInjection($inputs['inputs']['percent_compress']) : 0;
 
     /** Pego o ano atual **/
     $year = date('Y');
@@ -56,6 +57,10 @@ try {
     if (empty($extension)) {
         array_push($message, '$extension - O seguinte campo deve ser preenchido/selecionado');
     }
+    /** Verifico se o campo path foi preenchido **/
+    if ($percent_compress < 0) {
+        array_push($message, '$percent_compress - O seguinte campo deve ser preenchido/selecionado corretamente');
+    }
 
     if (count($message) > 0) {
 
@@ -84,13 +89,14 @@ try {
 
                 if (is_file($path . '/' . $name)) {
 
-                    if ($file->handling($path, $name)) {
+                    if ($file->handling($path, $name, $percent_compress)) {
 
                         /** Result **/
                         $result = array(
 
                             "cod" => 99,
                             "message" => "Arquivo tratado com sucesso!",
+                            "file" => $path."/compress/".$name,
 
                         );
 
@@ -175,13 +181,14 @@ try {
 
                     if (is_file($path . '/' . $name)) {
 
-                        if ($file->handling($path, $name)) {
+                        if ($file->handling($path, $name, $percent_compress)) {
 
                             /** Result **/
                             $result = array(
 
                                 "cod" => 99,
                                 "message" => "Arquivo tratado com sucesso!",
+                                "file" => $path."/compress/".$name,
 
                             );
 

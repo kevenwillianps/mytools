@@ -14,6 +14,7 @@ class File
     /** Variaveis da Classes **/
     private $path = null;
     private $name = null;
+    private $percent_compress = null;
     private $wideImage = null;
 
     public function __construct()
@@ -23,16 +24,17 @@ class File
         $this->wideImage = new \WideImage();
     }
 
-    public function handling($path, $name)
+    public function handling($path, $name, $percent_compress)
     {
 
         /** Parâmetros de entrada **/
-        $this->path = (string)$path;
-        $this->name = (string)$name;
+        $this->path             = (string)$path;
+        $this->name             = (string)$name;
+        $this->percent_compress = (int)$percent_compress;
 
         /** Corto a imagem para icone **/
         $this->wideImage = \WideImage::load($path.'/'.$name);
-        $this->wideImage = $this->wideImage->saveToFile($path.'/compress/'.$name, 20);
+        $this->wideImage = $this->wideImage->saveToFile($path.'/compress/'.$name, floor($this->percent_compress));
 
         if (is_file($this->path.'/compress/'.$this->name)) {
 
