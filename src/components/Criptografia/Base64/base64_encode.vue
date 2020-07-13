@@ -30,7 +30,7 @@
 
                 </div>
 
-                <input type="text" class="form-control" placeholder="Texto" aria-label="Example text with button addon" aria-describedby="button-addon1" v-model="inputs.text">
+                <input type="text" class="form-control" placeholder="Texto" aria-label="Example text with button addon" aria-describedby="button-addon1" v-model="inputs.text_encode">
 
             </div>
 
@@ -42,7 +42,37 @@
 
                 </label>
 
-                <textarea class="form-control" id="result" rows="3" v-model="query.result"></textarea>
+                <textarea class="form-control" id="result" rows="3" v-model="query.result_encode"></textarea>
+
+            </div>
+
+            <hr class="my-4">
+
+            <div class="input-group input-group-lg">
+
+                <div class="input-group-prepend">
+
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2" v-on:click="Decode()">
+
+                        🔨 Descriptografar
+
+                    </button>
+
+                </div>
+
+                <input type="text" class="form-control" placeholder="Texto" aria-label="Example text with button addon" aria-describedby="button-addon2" v-model="inputs.text_decode">
+
+            </div>
+
+            <div class="form-group mt-1">
+
+                <label for="result">
+
+                    Texto Codificado
+
+                </label>
+
+                <textarea class="form-control" id="result_decode" rows="3" v-model="query.result_decode"></textarea>
 
             </div>
 
@@ -67,13 +97,16 @@
                 /** Resultado das requisições **/
                 query : {
 
-                    result : null,
+                    result_encode : null,
+                    result_decode : null,
 
                 },
 
+                /** Campos para envio **/
                 inputs : {
 
-                    text : null,
+                    text_encode : null,
+                    text_decode : null,
 
                 }
 
@@ -91,7 +124,28 @@
                     /** Caso tenha sucesso **/
                     .then(response => {
 
-                        this.query.result = response.data.result;
+                        this.query.result_encode = response.data.result;
+
+                    })
+
+                    /** Caso tenha falha**/
+                    .catch(response => {
+
+                        console.log('Erro:' + response.data);
+
+                    })
+
+            },
+
+            Decode(){
+
+                /** Envio uma requisição para o meu servidor**/
+                axios.post('router.php?TABLE=CRIPTOGRAFIA&ACTION=BASE64_DECODE', {inputs : this.inputs})
+
+                    /** Caso tenha sucesso **/
+                    .then(response => {
+
+                        this.query.result_decode = response.data.result;
 
                     })
 

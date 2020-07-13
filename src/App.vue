@@ -38,16 +38,6 @@
 
                             </li>
 
-                            <li>
-
-                                <router-link to="/pessoal/edicao/segura/">
-
-                                    Edição Segura
-
-                                </router-link>
-
-                            </li>
-
                         </ul>
 
                     </li>

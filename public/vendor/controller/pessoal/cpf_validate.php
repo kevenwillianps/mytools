@@ -9,32 +9,36 @@
 
 /** Escolho as classes que irei utilizar **/
 use \vendor\model\Main;
-use \vendor\model\Base64;
+use \vendor\model\Cpf;
 
 /** realizo o instânciamento da classe **/
 $main = new Main();
-$base64 = new Base64();
+$cpf = new Cpf();
 
 try {
 
-   /** Capturo meus campos envios por json **/
+    /** Capturo meus campos envios por json **/
     $inputs = json_decode(file_get_contents('php://input'), true);
 
     /** Parâmetros de entrada **/
-    $text_encode = isset($inputs['inputs']['text_encode']) ? (string)$main->antiInjection($inputs['inputs']['text_encode']) : '';
+    $text = isset($inputs['inputs']['text']) ? (string)$main->antiInjection($inputs['inputs']['text']) : '';
 
     /** Controle de erros **/
     $message = array();
 
     /** Verifico se o campo foi preenchido **/
-    if (empty($text_encode)) {
+    if (empty($text)) {
         array_push($message, "O campo 'Texto', deve ser informado");
     }
 
     if (count($message) > 0) {
 
-       /** Preparo o formulario para retorno **/
-        $result = array("message" => $message);
+        /** Preparo o formulario para retorno **/
+        $result = array(
+
+            "message" => $message
+
+        );
 
         /**Envio*/
         echo json_encode($result);
@@ -43,11 +47,11 @@ try {
         exit;
     } else {
 
-       /** Executo determinado método **/
+        /** Executo determinado método **/
         /** Result **/
         $result = array(
 
-            "result" => $base64->encode($text_encode)
+            "result" => $cpf->validaCPF($text)
 
         );
 
@@ -59,7 +63,7 @@ try {
     }
 } catch (Exception $e) {
 
-   /** Preparo o formulario para retorno **/
+    /** Preparo o formulario para retorno **/
     $result = array("message" => $e->getMessage());
 
     /** Envio **/

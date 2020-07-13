@@ -30,7 +30,7 @@
 
                 </div>
 
-                <input type="text" class="form-control" placeholder="Cpf Gerado" aria-label="Example text with button addon" aria-describedby="button-addon1" v-model="query.result" id="result">
+                <input type="text" class="form-control" placeholder="CPF Gerado" aria-label="Example text with button addon" aria-describedby="button-addon1" v-model="query.result" id="result">
 
                 <div class="input-group-prepend">
 
@@ -39,6 +39,34 @@
                         ✏️Copiar
 
                     </button>
+
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <div class="input-group input-group-lg mb-3">
+
+                <div class="input-group-prepend">
+
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon3" v-on:click="ValidateCpf()">
+
+                        🔨 Validar
+
+                    </button>
+
+                </div>
+
+                <input type="text" class="form-control" placeholder="CPF Para Validar" aria-label="Recipient's username" aria-describedby="button-addon3" v-model="inputs.text">
+
+                <div class="input-group-append">
+
+                    <span class="input-group-text" id="button-addon4">
+
+                        {{ query.status }}
+
+                    </span>
 
                 </div>
 
@@ -65,6 +93,13 @@
                 query : {
 
                     result : null,
+                    status : null,
+
+                },
+
+                inputs : {
+
+                    text : null,
 
                 }
 
@@ -84,6 +119,36 @@
                     .then(response => {
 
                         this.query.result = response.data.result;
+
+                    })
+
+                    /** Caso tenha falha**/
+                    .catch(response => {
+
+                        console.log('Erro:' + response.data);
+
+                    })
+
+            },
+
+            /** Método para solicitar um novo CPF **/
+            ValidateCpf(){
+
+                /** Envio uma requisição para o meu servidor**/
+                axios.post('router.php?TABLE=PESSOAL&ACTION=CPF_VALIDATE', {inputs : this.inputs})
+
+                    /** Caso tenha sucesso **/
+                    .then(response => {
+                        
+                        if (response.data.result){
+
+                            this.query.status = 'Verdadeiro';
+
+                        }else{
+
+                            this.query.status = 'Falso';
+
+                        }
 
                     })
 

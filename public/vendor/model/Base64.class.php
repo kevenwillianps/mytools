@@ -13,6 +13,9 @@ namespace vendor\model;
 class Base64
 {
 
+    /** Declaro as variaveis que irei utilizar na classe **/
+    private $text = null;
+
     /**
      * Codifica o Texto de Entrada
      **/

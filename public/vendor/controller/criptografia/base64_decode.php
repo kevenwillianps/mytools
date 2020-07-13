@@ -21,13 +21,13 @@ try {
     $inputs = json_decode(file_get_contents('php://input'), true);
 
     /** Parâmetros de entrada **/
-    $text_encode = isset($inputs['inputs']['text_encode']) ? (string)$main->antiInjection($inputs['inputs']['text_encode']) : '';
+    $text_decode = isset($inputs['inputs']['text_decode']) ? (string)$main->antiInjection($inputs['inputs']['text_decode']) : '';
 
     /** Controle de erros **/
     $message = array();
 
     /** Verifico se o campo foi preenchido **/
-    if (empty($text_encode)) {
+    if (empty($text_decode)) {
         array_push($message, "O campo 'Texto', deve ser informado");
     }
 
@@ -45,11 +45,7 @@ try {
 
        /** Executo determinado método **/
         /** Result **/
-        $result = array(
-
-            "result" => $base64->encode($text_encode)
-
-        );
+        $result = array("result" => $base64->decode($text_decode));
 
         /** Envio **/
         echo json_encode($result);

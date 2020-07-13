@@ -129,7 +129,7 @@
 
             </div>
 
-            <div class="form-group">
+            <div class="form-group" v-if="!controls.progress_bar">
 
                 <input type="text" class="form-control" placeholder="Qualidade final da imagem" v-model="inputs.percent_compress"/>
 
@@ -139,17 +139,17 @@
 
                 <button class="btn btn-default" v-on:click="PrepareForm()" v-if="inputs_file.name.length > 0 && !controls.progress_bar">
 
-                    <i class="fas fa-paper-plane"></i> Comprimir
+                    <i class="fas fa-paper-plane mr-1"></i>Comprimir
 
                 </button>
 
             </div>
 
-            <div class="form-group mt-3" v-if="query.file">
+            <div class="form-group mt-3" v-if="query.file && !controls.progress_bar">
 
                 <a class="btn btn-default" v-bind:href="query.file" download>
 
-                    Baixar
+                    <i class="fas fa-cloud-download-alt mr-1"></i>Baixar
 
                 </a>
 
@@ -282,7 +282,7 @@
                     this.inputs_file.name_auxiliary.push(e.target.files[i].name);
 
                     /** Gero o nome que vai salvar no banco de dados **/
-                    this.inputs_file.name.push('mycms_' + (btoa(Math.random())) + '.' + (e.target.files[i].name.substring(e.target.files[i].name.indexOf(".") + 1)));
+                    this.inputs_file.name.push('MyTools_' + (btoa(Math.random())) + '.' + (e.target.files[i].name.substring(e.target.files[i].name.indexOf(".") + 1)));
 
                     /** Pego o tipo do arquivo **/
                     this.inputs_file.extension.push(e.target.files[i].type);
