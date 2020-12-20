@@ -1,0 +1,38 @@
+@font-face {
+    font-family: Poppins-Bold;
+    src: url(../fonts/Poppins/Poppins-Bold.ttf)
+}
+
+@font-face {
+    font-family: Poppins-SemiBold;
+    src: url(../fonts/Poppins/Poppins-SemiBold.ttf)
+}
+
+@font-face {
+    font-family: Poppins-Regular;
+    src: url(../fonts/Poppins/Poppins-Regular.ttf)
+}
+
+@font-face {
+    font-family: Poppins-Light;
+    src: url(../fonts/Poppins/Poppins-Light.ttf)
+}
+
+html {
+    scroll-behavior: smooth!important
+}
+
+body {
+
+    background: rgba(242, 245, 252, 1) !important;
+    color: #494f54!important;
+    font-family: Poppins-Regular!important;
+    padding-bottom: 10px;
+
+}
+
+.bg-light {
+
+    background-color: #ffffff !important;
+
+}
