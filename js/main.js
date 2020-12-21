@@ -123,7 +123,7 @@ function sendForm(form) {
 
                 }
 
-            }, 1000);
+            }, 500);
 
         },
 
